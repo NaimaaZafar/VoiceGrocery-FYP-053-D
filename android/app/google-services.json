@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "623012888388",
+    "firebase_url": "https://voicegrocery-fyp-default-rtdb.firebaseio.com",
+    "project_id": "voicegrocery-fyp",
+    "storage_bucket": "voicegrocery-fyp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623012888388:android:e796540516ae711bd16111",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623012888388-ia5i0fvjvj2dk7ijflr7pnqfil8tboa9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.application",
+            "certificate_hash": "fd6331752b02b4a18e5bad58ac95889fa62190ed"
+          }
+        },
+        {
+          "client_id": "623012888388-tsks3jmcn1eno36d8lf1s8g896pt0fmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA95cKiLKMmgSfjRvLHj_rASIBY6gBioN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623012888388-tsks3jmcn1eno36d8lf1s8g896pt0fmr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "623012888388-1jc9j9c65uus3fleptd6tcdrp76ffc7q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fyp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623012888388:android:1e0ae4e2f0622f46d16111",
+        "android_client_info": {
+          "package_name": "com.example.fyp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623012888388-tsks3jmcn1eno36d8lf1s8g896pt0fmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA95cKiLKMmgSfjRvLHj_rASIBY6gBioN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623012888388-tsks3jmcn1eno36d8lf1s8g896pt0fmr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "623012888388-1jc9j9c65uus3fleptd6tcdrp76ffc7q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fyp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
