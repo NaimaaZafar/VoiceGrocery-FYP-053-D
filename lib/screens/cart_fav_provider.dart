@@ -68,6 +68,15 @@ class CartFavoriteProvider extends ChangeNotifier {
     }
   }
 
+  bool checkIfExist(Food food) {
+    return favoriteItems.contains(food);
+  }
+
+  void RemoveDuplicates(){
+    _cartItems.toSet().toList();
+    notifyListeners();
+  }
+
   void decreaseQuantity(Food food) {
     var existingFood = _cartItems.firstWhere(
           (item) => item.name == food.name,

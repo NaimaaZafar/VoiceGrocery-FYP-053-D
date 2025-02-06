@@ -80,7 +80,14 @@ class _ProductCardState extends State<ProductCard> {
                         if (isFavorited) {
                           cartFavoriteProvider.removeFromFavorites(widget.food);
                         } else {
-                          cartFavoriteProvider.addToFavorites(widget.food);
+                          // Checking if the item is not already present within the list then adding
+                          if(cartFavoriteProvider.checkIfExist(widget.food)==false){
+                            cartFavoriteProvider.addToFavorites(widget.food);
+                          }
+                        //  prints already added
+                          else {
+                            print('Already added');
+                          }
                         }
                       });
                     },

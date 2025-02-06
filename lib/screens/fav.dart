@@ -77,6 +77,8 @@ class _FavScreenState extends State<FavScreen> {
           : ListView.builder(
         itemCount: favoriteItems.length,
         itemBuilder: (context, index) {
+          // returning unique favorite item
+
           return ProductCard(food: favoriteItems[index]); // Pass food object
         },
       ),
