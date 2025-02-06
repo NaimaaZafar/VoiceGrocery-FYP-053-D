@@ -1,16 +1,8 @@
-# fyp
+## Voice Grocery
+- Java SDK-17
+- Flutter
+- Dart
+- Android Studio
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Note:
+* Make sure to downgrade sdk to 17 using command `flutter config --jdk-dir "C:\Program Files\Java\jdk-17"` in terminal before that make sure jdk-17 is installed. https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.exe
