@@ -12,7 +12,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  // ge
   await GetStorage.init();
   runApp(const VoiceGrocery());
 }
