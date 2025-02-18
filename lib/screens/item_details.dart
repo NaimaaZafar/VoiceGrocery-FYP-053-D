@@ -8,6 +8,14 @@ import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:fyp/widgets/related_product_card.dart';
+import 'package:fyp/screens/cart_fav_provider.dart';
+import 'package:fyp/utils/food_menu.dart';
+import 'package:flutter/material.dart';
+import 'package:fyp/screens/item_details.dart';
+import 'package:provider/provider.dart';
+import 'package:fyp/screens/cart_fav_provider.dart'; // Import provider
+import 'package:fyp/utils/food_menu.dart'; // Make sure to import the Food model
+
 
 class ItemDetailsPage extends StatefulWidget {
   final String title;
@@ -31,7 +39,15 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
   final int _selectedIndex = 0; // Selected index for BottomNavigationBar
   List<double> starStates = [0, 0, 0, 0, 0]; // State for stars (0: empty, 1: full)
 
-  double get rating => starStates.reduce((a, b) => a + b); // Total rating
+  double get rating => starStates.reduce((a, b) => a + b);
+
+  late CartFavoriteProvider cartFavoriteProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    cartFavoriteProvider = CartFavoriteProvider(); // Initialize the provider
+  }
 
   void updateStarRating(int index) {
     setState(() {
@@ -43,6 +59,8 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
@@ -144,6 +162,18 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               const SizedBox(height: 20),
               Button(
                 onTap: () {
+                  Food food = Food(
+                    name: widget.title,
+                    price: double.parse(widget.price),
+                    imagePath: widget.image,
+                    category: FoodCategory.MeatsFishes,
+                    quantity: 1,
+                    descriptions: {},
+                  );
+                  cartFavoriteProvider.addToCart(food);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${food.name} added to cart')),
+                  );
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const MyCart()),
@@ -196,31 +226,11 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                   ],
                 ),
               ),
-              // Button(onTap: (){
-              //   Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckoutScreen()),
-              //   );
-              // }, text: 'Buy Now')
             ],
           ),
         ),
       ),
-      // bottomNavigationBar: CustomNavBar(
-      //   currentIndex: _selectedIndex,
-      //   onItemSelected: (index) {
-      //     if (index != _selectedIndex) {
-      //       setState(() {
-      //         _selectedIndex = index;
-      //       });
-      //       if (index == 0) {
-      //         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage1()));
-      //       } else if (index == 1) {
-      //         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SearchPage()));
-      //       } else if (index == 2) {
-      //         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AccountsPage())); // Fixed navigation
-      //       }
-      //     }
-      //   },
-      // ),
+
     );
   }
 }

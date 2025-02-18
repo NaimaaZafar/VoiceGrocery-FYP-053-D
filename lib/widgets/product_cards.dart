@@ -15,12 +15,19 @@ class ProductCard extends StatefulWidget {
   @override
   _ProductCardState createState() => _ProductCardState();
 }
-
 class _ProductCardState extends State<ProductCard> {
+  late bool isFavorites;
+
+  @override
+  void initState() {
+    super.initState();
+    final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+    isFavorites = cartFavoriteProvider.favoriteItems.contains(widget.food);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context);
-    bool isFavorited = cartFavoriteProvider.favoriteItems.contains(widget.food);
 
     return GestureDetector(
       onTap: () {
@@ -31,7 +38,7 @@ class _ProductCardState extends State<ProductCard> {
               title: widget.food.name,
               price: widget.food.price.toString(),
               image: widget.food.imagePath,
-              description: widget.food.getDescription('en'),  // Pass description here
+              description: widget.food.getDescription('en'),
             ),
           ),
         );
@@ -71,17 +78,19 @@ class _ProductCardState extends State<ProductCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   IconButton(
-                    // printing the isFavorited result
                     icon: Icon(
-                      isFavorited ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorited ? Colors.red : Colors.grey,
+                      isFavorites ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorites ? Colors.red : Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {
-                        if (isFavorited) {
-                          cartFavoriteProvider.removeFromFavorites(widget.food);
-                        } else {
+                        isFavorites = !isFavorites;
+                        if (isFavorites) {
+                          widget.food.isFavorite = true;
                           cartFavoriteProvider.addToFavorites(widget.food);
+                        } else {
+                          widget.food.isFavorite = false;
+                          cartFavoriteProvider.removeFromFavorites(widget.food);
                         }
                       });
                     },

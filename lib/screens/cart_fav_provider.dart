@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp/utils/food_menu.dart';
 
-
 class CartFavoriteProvider extends ChangeNotifier {
   final List<Food> _favoriteItems = [];
   final List<Food> _cartItems = [];
@@ -22,6 +21,7 @@ class CartFavoriteProvider extends ChangeNotifier {
   void addToFavorites(Food food) {
     if (!_favoriteItems.contains(food)) {
       _favoriteItems.add(food);
+      _favoriteItems.toSet().toList(); // Remove duplicates
       notifyListeners();
     }
   }
@@ -66,6 +66,15 @@ class CartFavoriteProvider extends ChangeNotifier {
       existingFood.quantity++; // Increase quantity
       notifyListeners();
     }
+  }
+
+  bool checkIfExist(Food food) {
+    return favoriteItems.contains(food);
+  }
+
+  void removeDuplicates() {
+    _cartItems.toSet().toList();
+    notifyListeners();
   }
 
   void decreaseQuantity(Food food) {

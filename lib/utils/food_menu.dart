@@ -14,6 +14,7 @@ class Food {
   final String imagePath;
   final double price;
   final FoodCategory category;
+  bool isFavorite;
   int quantity;
 
   Food({
@@ -22,6 +23,7 @@ class Food {
     required this.imagePath,
     required this.price,
     required this.category,
+    this.isFavorite = false,
     this.quantity = 0,
   });
 
@@ -31,7 +33,8 @@ class Food {
         imagePath = res['imagePath'],
         price = res['price'],
         category = FoodCategory.values[res['category']],
-        quantity = res['quantity'];
+        quantity = res['quantity'],
+        isFavorite = res['isFavorite'];
 
   Map<String, Object?> toMap() {
     return {
@@ -41,6 +44,7 @@ class Food {
       'price': price,
       'category': category.index,
       'quantity': quantity,
+      'isFavorite': isFavorite,
     };
   }
 

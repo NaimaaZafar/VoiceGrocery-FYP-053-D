@@ -15,4 +15,5 @@ Bugs:
 - Duplication in the favourite list
 - The heart on the is not staying
 - Uploading images to the database as hash64
-- Payment Card ==> fix 
+- Payment Card ==> fixed
+- Buy now buf ==> fixed
