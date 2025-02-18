@@ -144,22 +144,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ],
       ),
       drawer: MyDrawer(),
-      // backgroundColor: Colors.white,
-      // body: NestedScrollView(
-      //   headerSliverBuilder: (context, innerBoxIsScrolled) =>
-      //   [
-      //     MySliverAppBar(
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.end,
-      //         children: [
-      //
-      //         ],
-      //       ),
-      //       title: Text('Title'),
-      //     )
-      //   ],
-      //   body: Container(color: Colors.white),
-      // ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -236,19 +221,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
             child: CategoryContent(category: selectedCategory),
           ),
 
-          // Expanded(child: FutureBuilder(
-          //   future: getdocIDs(),
-          //   builder: (context, snapshot){
-          //   return  ListView.builder(
-          //     itemCount: docIDs.length,
-          //     itemBuilder: (context, index){
-          //       return ListTile(
-          //         title: GetUserName(docID: docIDs[index]),
-          //       );
-          //     },
-          //   );
-          // },)
-          // )
         ],
       ),
       bottomNavigationBar: CustomNavBar(

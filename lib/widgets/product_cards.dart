@@ -71,6 +71,7 @@ class _ProductCardState extends State<ProductCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   IconButton(
+                    // printing the isFavorited result
                     icon: Icon(
                       isFavorited ? Icons.favorite : Icons.favorite_border,
                       color: isFavorited ? Colors.red : Colors.grey,

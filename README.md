@@ -9,3 +9,10 @@ Note:
 * Restart your android studio.
 * Run command `flutter clean'
 * Run command 'flutter update'
+
+
+Bugs:
+- Duplication in the favourite list
+- The heart on the is not staying
+- Uploading images to the database as hash64
+- Payment Card ==> fix 
