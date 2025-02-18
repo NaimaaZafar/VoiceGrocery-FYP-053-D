@@ -98,6 +98,8 @@ class _FavScreenState extends State<FavScreen> {
 
         itemCount: favoriteItems.length,
         itemBuilder: (context, index) {
+          // returning unique favorite item
+
           return ProductCard(food: favoriteItems[index]); // Pass food object
         },
       ),
