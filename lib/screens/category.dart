@@ -6,6 +6,7 @@ import 'package:fyp/widgets/my_drawer.dart';
 import 'package:fyp/widgets/my_sliver_app_bar.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:fyp/screens/fav.dart';
+import 'package:fyp/screens/cart_fav_provider.dart';
 import 'package:fyp/screens/profile.dart';
 import 'package:fyp/screens/my_cart.dart';
 import 'package:fyp/screens/search_product.dart';
@@ -13,6 +14,7 @@ import 'package:fyp/utils/category_content.dart';
 import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/category_button.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:provider/provider.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryName;
@@ -27,18 +29,6 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  // List<String> docIDs = [];
-  // Future getdocIDs() async {
-  //   await FirebaseFirestore.instance.collection('users').orderBy('first name', descending: false).get().then(
-  //       (snapshot) => snapshot.docs.forEach(
-  //           (document) {
-  //             print(document.reference);
-  //             docIDs.add(document.reference.id);
-  //           }
-  //       ),
-  //   );
-  // }
-
   late String selectedCategory;
   late ScrollController _scrollController;
   final TextEditingController _searchController = TextEditingController();
@@ -119,6 +109,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
   }
 
+  // getting size of cart
+  int sizeofcart() {
+    final cartFavoriteProvider =
+        Provider.of<CartFavoriteProvider>(context, listen: false);
+    return cartFavoriteProvider.cartItems.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,7 +133,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           Center(
             child: badges.Badge(
               badgeContent: Text(
-                '0',
+                sizeofcart().toString(),
                 style: TextStyle(color: Colors.white),
               ),
               //animationDuration: Duration(microseconds: 300),

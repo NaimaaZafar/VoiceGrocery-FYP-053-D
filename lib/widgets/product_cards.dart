@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp/screens/item_details.dart';
 import 'package:provider/provider.dart';
 import 'package:fyp/screens/cart_fav_provider.dart'; // Import provider
@@ -15,14 +16,31 @@ class ProductCard extends StatefulWidget {
   @override
   _ProductCardState createState() => _ProductCardState();
 }
+
 class _ProductCardState extends State<ProductCard> {
   late bool isFavorites;
 
   @override
   void initState() {
     super.initState();
-    final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+    final cartFavoriteProvider =
+        Provider.of<CartFavoriteProvider>(context, listen: false);
     isFavorites = cartFavoriteProvider.favoriteItems.contains(widget.food);
+  }
+
+  Future<void> _updateFavoriteStatus(bool isFavorite) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: widget.food.name)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.update({'Fav': isFavorite});
+      }
+    } catch (e) {
+      print('Error updating favorite status: $e');
+    }
   }
 
   @override
@@ -51,7 +69,8 @@ class _ProductCardState extends State<ProductCard> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              Image.asset(widget.food.imagePath, width: 80, height: 80, fit: BoxFit.cover),
+              Image.asset(widget.food.imagePath,
+                  width: 80, height: 80, fit: BoxFit.cover),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -61,13 +80,15 @@ class _ProductCardState extends State<ProductCard> {
                     children: [
                       Text(
                         widget.food.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 5),
                       Text(
                         '\$${widget.food.price}',
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                     ],
                   ),
@@ -79,31 +100,38 @@ class _ProductCardState extends State<ProductCard> {
                 children: [
                   IconButton(
                     icon: Icon(
-                      isFavorites ? Icons.favorite : Icons.favorite_border,
+                      widget.food.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
                       color: isFavorites ? Colors.red : Colors.grey,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         isFavorites = !isFavorites;
                         if (isFavorites) {
                           widget.food.isFavorite = true;
                           cartFavoriteProvider.addToFavorites(widget.food);
+                          // print("Added to fav");
                         } else {
                           widget.food.isFavorite = false;
                           cartFavoriteProvider.removeFromFavorites(widget.food);
+                          // print("Removed to fav");
                         }
                       });
+                      await _updateFavoriteStatus(isFavorites);
                     },
                   ),
                   ElevatedButton(
                     onPressed: () {
                       cartFavoriteProvider.addToCart(widget.food);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${widget.food.name} added to cart')),
+                        SnackBar(
+                            content: Text('${widget.food.name} added to cart')),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 5),
                       backgroundColor: Colors.white,
                     ),
                     child: const Text(

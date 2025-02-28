@@ -51,7 +51,7 @@ class Food {
         price = res['price'],
         category = Food.check(res['category']),
         quantity = res['quantity'],
-        isFavorite = false;
+        isFavorite = res['Fav'];
 
   Map<String, Object?> toMap() {
     return {
@@ -92,6 +92,13 @@ class Restaurant {
       );
     } catch (e) {
       print('Error fetching food menu: $e');
+    }
+  }
+
+  // Function to update 'Fav' in each
+  void updateFavorites(List<String> favoriteNames) {
+    for (var food in foodMenu) {
+      food.isFavorite = favoriteNames.contains(food.name);
     }
   }
 }
