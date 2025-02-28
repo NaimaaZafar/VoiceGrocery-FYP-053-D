@@ -16,19 +16,24 @@ Future<void> main() async {
   await GetStorage.init();
 
   // Fetch food menu from firebase
-  // final Rest = Restaurant();
-  // await Rest.fetchFoodMenu();
+  final restaurant = Restaurant();
+  await restaurant.fetchFoodMenu();
 
-  runApp(const VoiceGrocery());
+  runApp(VoiceGrocery(restaurant: restaurant));
 }
 
 class VoiceGrocery extends StatelessWidget {
-  const VoiceGrocery({super.key});
+  final Restaurant restaurant;
+
+  const VoiceGrocery({super.key, required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => CartFavoriteProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartFavoriteProvider()),
+        Provider<Restaurant>.value(value: restaurant),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Splashscreen(), // Your splash screen as the initial screen

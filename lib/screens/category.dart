@@ -27,7 +27,6 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-
   // List<String> docIDs = [];
   // Future getdocIDs() async {
   //   await FirebaseFirestore.instance.collection('users').orderBy('first name', descending: false).get().then(
@@ -52,9 +51,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    selectedCategory = widget.categoryName.isNotEmpty
-        ? widget.categoryName
-        : 'Meats & Fishes';
+    selectedCategory =
+        widget.categoryName.isNotEmpty ? widget.categoryName : 'Meats & Fishes';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToCategory();
@@ -64,21 +62,29 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Future fetchUserFirstName() async {
-    try{
-      final snapshot = await FirebaseFirestore.instance.collection('users').doc('AUBPUQqj1eFUiTWQLz7C').get();
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc('AUBPUQqj1eFUiTWQLz7C')
+          .get();
       if (snapshot.exists) {
         setState(() {
-          firstName = snapshot.data()?['first name']?? 'users';
+          firstName = snapshot.data()?['first name'] ?? 'users';
         });
       }
-    }
-    catch (e) {
+    } catch (e) {
       print('Error fetching user name: $e');
     }
   }
 
   void scrollToCategory() {
-    final categories = ['Meats & Fishes', 'Fresh Vegetables', 'Fresh Fruits', 'Snacks', 'Brooki Bakery'];
+    final categories = [
+      'Meats & Fishes',
+      'Fresh Vegetables',
+      'Fresh Fruits',
+      'Snacks',
+      'Brooki Bakery'
+    ];
     final index = categories.indexOf(selectedCategory);
 
     if (index != -1) {
@@ -96,13 +102,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
     });
 
     if (index == 0) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (_) =>
+                  const CategoryScreen(categoryName: 'MeatsFishes')));
     } else if (index == 1) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const FavScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const FavScreen()));
     } else if (index == 2) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AccountsPage()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const AccountsPage()));
     } else if (index == 3) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
     }
   }
 
@@ -110,9 +123,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Hey'
-        ),
+        title: Text('Hey'),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -123,28 +134,26 @@ class _CategoryScreenState extends State<CategoryScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Center(
-              child: badges.Badge(
-                badgeContent: Text(
-                  '0',
-                  style: TextStyle(
-                    color: Colors.white
-                  ),
-                ),
-                //animationDuration: Duration(microseconds: 300),
-                child:  IconButton(
-                  icon: const Icon(Icons.shopping_cart),
-                  iconSize: 25,
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MyCart()));
-                  },
-                ),
+            child: badges.Badge(
+              badgeContent: Text(
+                '0',
+                style: TextStyle(color: Colors.white),
               ),
+              //animationDuration: Duration(microseconds: 300),
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                iconSize: 25,
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MyCart()));
+                },
+              ),
+            ),
           ),
           SizedBox(width: 25),
         ],
       ),
       drawer: MyDrawer(),
-
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -220,7 +229,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
           Expanded(
             child: CategoryContent(category: selectedCategory),
           ),
-
         ],
       ),
       bottomNavigationBar: CustomNavBar(

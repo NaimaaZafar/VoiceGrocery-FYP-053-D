@@ -11,8 +11,14 @@ class CartFavoriteProvider extends ChangeNotifier {
   // Get the quantity of a food item in the cart
   int getQuantity(Food food) {
     final existingFood = _cartItems.firstWhere(
-          (item) => item.name == food.name,
-      orElse: () => Food(name: '', descriptions: {}, imagePath: '', price: 0, category: FoodCategory.MeatsFishes, quantity: 0),
+      (item) => item.name == food.name,
+      orElse: () => Food(
+          name: '',
+          descriptions: {},
+          imagePath: '',
+          price: 0,
+          category: FoodCategory.MeatsFishes,
+          quantity: 0),
     );
     return existingFood.quantity;
   }
@@ -36,8 +42,14 @@ class CartFavoriteProvider extends ChangeNotifier {
   void addToCart(Food food) {
     // Check if the item is already in the cart
     var existingFood = _cartItems.firstWhere(
-          (item) => item.name == food.name,
-      orElse: () => Food(name: '', descriptions: {}, imagePath: '', price: 0, category: FoodCategory.MeatsFishes, quantity: 0),
+      (item) => item.name == food.name,
+      orElse: () => Food(
+          name: '',
+          descriptions: {},
+          imagePath: '',
+          price: 0,
+          category: FoodCategory.MeatsFishes,
+          quantity: 0),
     );
 
     if (existingFood.name == '') {
@@ -58,8 +70,14 @@ class CartFavoriteProvider extends ChangeNotifier {
 
   void increaseQuantity(Food food) {
     var existingFood = _cartItems.firstWhere(
-          (item) => item.name == food.name,
-      orElse: () => Food(name: '', descriptions: {}, imagePath: '', price: 0, category: FoodCategory.MeatsFishes, quantity: 0),
+      (item) => item.name == food.name,
+      orElse: () => Food(
+          name: '',
+          descriptions: {},
+          imagePath: '',
+          price: 0,
+          category: FoodCategory.MeatsFishes,
+          quantity: 0),
     );
 
     if (existingFood.name != '') {
@@ -79,8 +97,14 @@ class CartFavoriteProvider extends ChangeNotifier {
 
   void decreaseQuantity(Food food) {
     var existingFood = _cartItems.firstWhere(
-          (item) => item.name == food.name,
-      orElse: () => Food(name: '', descriptions: {}, imagePath: '', price: 0, category: FoodCategory.MeatsFishes, quantity: 0),
+      (item) => item.name == food.name,
+      orElse: () => Food(
+          name: '',
+          descriptions: {},
+          imagePath: '',
+          price: 0,
+          category: FoodCategory.MeatsFishes,
+          quantity: 0),
     );
 
     if (existingFood.name != '' && existingFood.quantity > 1) {
