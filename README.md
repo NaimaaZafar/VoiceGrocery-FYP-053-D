@@ -14,8 +14,8 @@ Note:
 
 Bugs:
 
-- Duplication in the favourite list
-- The heart on the is not staying
+- Duplication in the favourite list ==> Done
+- The heart on the is not staying ==> Done
 - Uploading images to the database as hash64 ==> Done
 - Payment Card ==> Done
 - Buy now buf ==> Done

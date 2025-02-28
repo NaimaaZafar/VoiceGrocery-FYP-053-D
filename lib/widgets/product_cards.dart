@@ -103,7 +103,7 @@ class _ProductCardState extends State<ProductCard> {
                       widget.food.isFavorite
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      color: isFavorites ? Colors.red : Colors.grey,
+                      color: widget.food.isFavorite ? Colors.red : Colors.grey,
                     ),
                     onPressed: () async {
                       setState(() {
