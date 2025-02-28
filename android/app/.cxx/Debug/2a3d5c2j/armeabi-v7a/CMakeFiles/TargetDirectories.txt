@@ -1,0 +1,2 @@
+C:/Users/Hp/Desktop/Naima/VoiceGrocery/android/app/.cxx/Debug/2a3d5c2j/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Hp/Desktop/Naima/VoiceGrocery/android/app/.cxx/Debug/2a3d5c2j/armeabi-v7a/CMakeFiles/rebuild_cache.dir

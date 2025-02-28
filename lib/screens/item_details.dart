@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:fyp/screens/cart_fav_provider.dart'; // Import provider
 import 'package:fyp/utils/food_menu.dart'; // Make sure to import the Food model
 
-
 class ItemDetailsPage extends StatefulWidget {
   final String title;
   final String price;
@@ -37,7 +36,13 @@ class ItemDetailsPage extends StatefulWidget {
 
 class _ItemDetailsPageState extends State<ItemDetailsPage> {
   final int _selectedIndex = 0; // Selected index for BottomNavigationBar
-  List<double> starStates = [0, 0, 0, 0, 0]; // State for stars (0: empty, 1: full)
+  List<double> starStates = [
+    0,
+    0,
+    0,
+    0,
+    0
+  ]; // State for stars (0: empty, 1: full)
 
   double get rating => starStates.reduce((a, b) => a + b);
 
@@ -59,20 +64,26 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context);
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
-        title: Text(widget.title, style: TextStyle(color: Colors.white),),
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: bg_dark,
         actions: [
           IconButton(
             onPressed: () {
               // Navigate to Cart
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const MyCart()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => const MyCart()));
             },
-            icon: const Icon(Icons.shopping_cart, color: Colors.white,),
+            icon: const Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -164,7 +175,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
                 onTap: () {
                   Food food = Food(
                     name: widget.title,
-                    price: double.parse(widget.price),
+                    price: int.parse(widget.price),
                     imagePath: widget.image,
                     category: FoodCategory.MeatsFishes,
                     quantity: 1,
@@ -191,7 +202,7 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.description,  // Displays the product description
+                widget.description, // Displays the product description
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 20),
@@ -230,7 +241,6 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
           ),
         ),
       ),
-
     );
   }
 }
