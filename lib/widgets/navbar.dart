@@ -36,6 +36,10 @@ class CustomNavBar extends StatelessWidget {
           icon: Icon(Icons.settings),
           label: 'Settings',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.mic),
+          label: 'Voice',
+        ),
       ],
     );
   }

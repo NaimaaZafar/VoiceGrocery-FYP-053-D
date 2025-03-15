@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp/screens/category.dart';
 import 'package:fyp/screens/fav.dart';
 import 'package:fyp/screens/settings.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:fyp/widgets/navbar.dart';
@@ -85,27 +86,22 @@ class _AccountsPageState extends State<AccountsPage> {
       _selectedIndex = index;
     });
 
-    // Using Navigator to push replacement
     if (index == 0) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')),
-      );
+          context,
+          MaterialPageRoute(
+              builder: (_) => const CategoryScreen(categoryName: '')));
     } else if (index == 1) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => FavScreen()),
-      );
+          context, MaterialPageRoute(builder: (_) => const FavScreen()));
     } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AccountsPage()),
-      );
+      // We're already on the Profile screen
     } else if (index == 3) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-      );
+          context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()));
     }
   }
 

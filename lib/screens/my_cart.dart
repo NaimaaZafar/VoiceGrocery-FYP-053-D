@@ -5,6 +5,7 @@ import 'package:fyp/screens/category.dart';
 import 'package:fyp/screens/fav.dart';
 import 'package:fyp/screens/settings.dart';
 import 'package:fyp/screens/checkout.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:provider/provider.dart';
@@ -32,12 +33,12 @@ class _MyCartState extends State<MyCart> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')),
+        MaterialPageRoute(builder: (_) => const CategoryScreen(categoryName: '')),
       );
     } else if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => FavScreen()),
+        MaterialPageRoute(builder: (_) => const FavScreen()),
       );
     } else if (index == 2) {
       Navigator.pushReplacement(
@@ -48,6 +49,11 @@ class _MyCartState extends State<MyCart> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const SettingsScreen()),
+      );
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()),
       );
     }
   }

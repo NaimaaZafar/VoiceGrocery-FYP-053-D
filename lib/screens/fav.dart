@@ -9,6 +9,7 @@ import 'package:fyp/widgets/product_cards.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/food_menu.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 
 class FavScreen extends StatefulWidget {
   final int initialIndex;
@@ -34,28 +35,22 @@ class _FavScreenState extends State<FavScreen> {
       _selectedIndex = index;
     });
 
-    // Using Navigator to push replacement
     if (index == 0) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')),
-      );
+          context,
+          MaterialPageRoute(
+              builder: (_) => const CategoryScreen(categoryName: '')));
     } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => FavScreen()),
-      );
+      // We're already on the Favorite screen
     } else if (index == 2) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AccountsPage()),
-      );
+          context, MaterialPageRoute(builder: (_) => const AccountsPage()));
     } else if (index == 3) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-      );
+          context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()));
     }
   }
 

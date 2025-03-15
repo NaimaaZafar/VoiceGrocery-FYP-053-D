@@ -8,6 +8,7 @@ import 'package:fyp/screens/notifications.dart';
 import 'package:fyp/screens/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fyp/widgets/navbar.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -24,27 +25,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedIndex = index;
     });
 
-    // Using Navigator to push replacement
     if (index == 0) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')),
-      );
+          context,
+          MaterialPageRoute(
+              builder: (_) => const CategoryScreen(categoryName: '')));
     } else if (index == 1) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => FavScreen()),
-      );
+          context, MaterialPageRoute(builder: (_) => const FavScreen()));
     } else if (index == 2) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AccountsPage()),
-      );
+          context, MaterialPageRoute(builder: (_) => const AccountsPage()));
     } else if (index == 3) {
+      // We're already on the Settings screen
+    } else if (index == 4) {
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-      );
+          context, MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()));
     }
   }
 

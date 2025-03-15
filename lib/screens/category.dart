@@ -15,6 +15,7 @@ import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/category_button.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryName;
@@ -106,6 +107,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
     } else if (index == 3) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    } else if (index == 4) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()));
     }
   }
 
