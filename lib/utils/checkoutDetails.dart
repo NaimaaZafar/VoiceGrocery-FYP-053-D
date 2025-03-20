@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fyp/utils/colors.dart';
 import 'package:fyp/utils/payment_details.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:fyp/widgets/text_field.dart';
-import 'package:fyp/widgets/dropdown_input.dart';
 
 class CheckoutDetails extends StatefulWidget {
   const CheckoutDetails({super.key});
@@ -14,24 +15,47 @@ class CheckoutDetails extends StatefulWidget {
 
 class _CheckoutDetailsState extends State<CheckoutDetails> {
   final _formKey = GlobalKey<FormState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _postalCodeController = TextEditingController();
-
-  final List<String> _provinces = ['Punjab', 'Sindh', 'KPK'];
-  String? _selectedProvince = 'Punjab'; // Default value
 
   @override
-  void dispose() {
-    _fullNameController.dispose();
-    _phoneNumberController.dispose();
-    _cityController.dispose();
-    _addressController.dispose();
-    _postalCodeController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc =
+      await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _fullNameController.text = data['fullName'] ?? '';
+          _phoneNumberController.text = data['phoneNumber'] ?? '';
+          _cityController.text = data['city'] ?? '';
+          _addressController.text = data['address'] ?? '';
+        });
+      }
+    }
+  }
+
+  Future<void> _saveUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      await _firestore.collection('users').doc(user.uid).set({
+        'fullName': _fullNameController.text.trim(),
+        'phoneNumber': _phoneNumberController.text.trim(),
+        'city': _cityController.text.trim(),
+        'address': _addressController.text.trim(),
+      }, SetOptions(merge: true));
+    }
   }
 
   String? _validateField(String? value, String fieldName) {
@@ -46,15 +70,6 @@ class _CheckoutDetailsState extends State<CheckoutDetails> {
       return 'Phone number is required';
     } else if (!RegExp(r'^\d{10,11}$').hasMatch(value)) {
       return 'Enter a valid phone number';
-    }
-    return null;
-  }
-
-  String? _validatePostalCode(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Postal code is required';
-    } else if (!RegExp(r'^\d{5}$').hasMatch(value)) {
-      return 'Enter a valid 5-digit postal code';
     }
     return null;
   }
@@ -90,17 +105,6 @@ class _CheckoutDetailsState extends State<CheckoutDetails> {
                 validator: _validatePhoneNumber,
               ),
               const SizedBox(height: 10),
-              DropdownInput(
-                hintText: 'Select Province',
-                items: _provinces,
-                selectedItem: _selectedProvince,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedProvince = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
               TextFieldInput(
                 textEditingController: _cityController,
                 hintText: 'Enter your city',
@@ -116,18 +120,11 @@ class _CheckoutDetailsState extends State<CheckoutDetails> {
                 obscureText: false,
                 validator: (value) => _validateField(value, 'Address'),
               ),
-              const SizedBox(height: 10),
-              TextFieldInput(
-                textEditingController: _postalCodeController,
-                hintText: 'Enter your postal code',
-                icon: Icons.local_post_office,
-                obscureText: false,
-                validator: _validatePostalCode,
-              ),
               const SizedBox(height: 20),
               Button(
-                onTap: () {
+                onTap: () async {
                   if (_formKey.currentState?.validate() ?? false) {
+                    await _saveUserData(); // Save data to Firebase
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const PaymentDetailsScreen()),

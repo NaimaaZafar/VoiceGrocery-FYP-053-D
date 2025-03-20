@@ -105,10 +105,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
     } else if (index == 2) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const AccountsPage()));
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-    } else if (index == 4) {
+    }
+    else if (index == 3) {
+      // We're already on the Settings screen
+      Navigator.pushReplacement(context,
+      MaterialPageRoute(builder: (_) => const SettingsScreen()));
+    }
+    else if (index == 4) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const VoiceRecognitionScreen()));
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp/screens/add_new_card.dart';
+import 'package:fyp/screens/delivery_options.dart';
 import 'package:fyp/screens/success.dart';
 import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/button.dart';
@@ -53,32 +54,32 @@ class _PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
             ],
           ),
           const SizedBox(height: 40), // Space between options and button
-            Button(
-              onTap: () {
-                if (_selectedPaymentMethod == 'Credit Card') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddCardScreen(),
-                    ),
-                  );
-                } else if (_selectedPaymentMethod == 'COD') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SuccessScreen(),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please select a payment method'),
-                    ),
-                  );
-                }
-              },
-              text: "NEXT",
-            ),
+      Button(
+        onTap: () {
+          if (_selectedPaymentMethod == 'Credit Card') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddCardScreen(),
+              ),
+            );
+          } else if (_selectedPaymentMethod == 'COD') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DeliveryOptionScreen(paymentMethod: _selectedPaymentMethod!),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select a payment method'),
+              ),
+            );
+          }
+        },
+        text: "NEXT",
+      ),
         ],
       ),
     );

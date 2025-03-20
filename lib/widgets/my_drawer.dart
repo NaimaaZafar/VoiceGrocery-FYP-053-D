@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fyp/screens/feedback.dart';
+import 'package:fyp/screens/profile.dart';
 import 'package:fyp/screens/settings.dart';
 import 'package:fyp/widgets/my_drawer_tile.dart';
 
@@ -28,9 +30,17 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             MyDrawerTile(text: 'H O M E', icon: Icons.home, onTap: () => Navigator.pop(context)),
-            MyDrawerTile(text: 'S E T T I N G S', icon: Icons.settings, onTap: () {
+            // MyDrawerTile(text: 'S E T T I N G S', icon: Icons.settings, onTap: () {
+            //   Navigator.pop(context);
+            //   Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen(),));
+            // }),
+            MyDrawerTile(text:'F E E D B A C K', icon: Icons.feedback, onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen(),));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SendFeedbackPage(),)); // Uncomment this line after creating the FeedbackScreen
+            }),
+            MyDrawerTile(text: 'E D I T  P R O F I L E', icon: Icons.info, onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AccountsPage(),)); // Uncomment this line after creating the EditProfileScreen
             }),
             const Spacer(),
             MyDrawerTile(text: 'L O G O U T', icon: Icons.logout, onTap: () {}),
