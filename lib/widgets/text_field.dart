@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-class TextFieldInput extends StatelessWidget{
+class TextFieldInput extends StatelessWidget {
   final TextEditingController textEditingController;
   final String hintText;
   final IconData icon;
   final bool obscureText;
+  final String? Function(String?)? validator; // Added validator parameter
 
   const TextFieldInput({
     super.key,
@@ -12,15 +13,17 @@ class TextFieldInput extends StatelessWidget{
     required this.hintText,
     required this.icon,
     required this.obscureText,
+    this.validator, // Accepting validator function
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: TextField(
+      child: TextFormField(
         controller: textEditingController,
         obscureText: obscureText,
+        validator: validator, // Applying validator
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(
@@ -28,7 +31,7 @@ class TextFieldInput extends StatelessWidget{
             fontSize: 18,
           ),
           prefixIcon: Icon(
-            icon ,
+            icon,
             color: Colors.black45,
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -46,7 +49,7 @@ class TextFieldInput extends StatelessWidget{
               width: 2,
               color: Colors.white,
             ),
-            borderRadius: BorderRadius.circular(30)
+            borderRadius: BorderRadius.circular(30),
           ),
         ),
       ),

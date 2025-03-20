@@ -9,6 +9,7 @@ import 'package:fyp/utils/colors.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:fyp/widgets/text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountsPage extends StatefulWidget {
   const AccountsPage({super.key});
@@ -40,43 +41,98 @@ class _AccountsPageState extends State<AccountsPage> {
           .doc(user.uid)
           .get();
 
-      setState(() {
-        _nameController.text = userDoc['name'] ?? '';
-        _emailController.text = user.email ?? '';
-        _phoneController.text = userDoc['phone'] ?? '';
-      });
+      if (userDoc.exists) {
+        setState(() {
+          _nameController.text = "${userDoc['firstName']} ${userDoc['lastName']}";
+          _emailController.text = userDoc['email'];
+          _phoneController.text = userDoc['phone'];
+        });
+      }
     }
   }
+
 
   Future<void> _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       try {
         User? user = FirebaseAuth.instance.currentUser;
+        if (user == null) return;
 
-        if (user != null) {
-          if (_emailController.text != user.email) {
-            await user.updateEmail(_emailController.text);
-          }
+        String? email = user.email;
+        String password = _oldPasswordController.text; // Old password is required for re-authentication
 
-          if (_newPasswordController.text.isNotEmpty) {
-            await user.updatePassword(_newPasswordController.text);
-          }
+        // Get credentials for re-authentication
+        AuthCredential credential = EmailAuthProvider.credential(email: email!, password: password);
 
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-            'name': _nameController.text,
-            'phone': _phoneController.text,
-          });
+        // Re-authenticate the user
+        await user.reauthenticateWithCredential(credential);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile Updated Successfully')),
-          );
+        // Update Email if changed
+        if (_emailController.text != email) {
+          await user.updateEmail(_emailController.text);
         }
+
+        // Update Password if provided
+        if (_newPasswordController.text.isNotEmpty) {
+          await user.updatePassword(_newPasswordController.text);
+        }
+
+        // Update Firestore user details
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+          'firstName': _nameController.text.split(" ")[0],  // Extract first name
+          'lastName': _nameController.text.split(" ").length > 1 ? _nameController.text.split(" ")[1] : '',
+          'phone': _phoneController.text,
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile Updated Successfully')),
+        );
+
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.message}')),
         );
       }
     }
+  }
+
+
+  String? _validateName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Name is required';
+    }
+    if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
+      return 'Enter a valid name (letters only)';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email is required';
+    }
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value != null && value.isNotEmpty && value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+    if (!RegExp(r"^\d{10,15}$").hasMatch(value)) {
+      return 'Enter a valid phone number (10-15 digits)';
+    }
+    return null;
   }
 
   int _selectedIndex = 2;
@@ -94,8 +150,6 @@ class _AccountsPageState extends State<AccountsPage> {
     } else if (index == 1) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const FavScreen()));
-    } else if (index == 2) {
-      // We're already on the Profile screen
     } else if (index == 3) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
@@ -111,12 +165,12 @@ class _AccountsPageState extends State<AccountsPage> {
       appBar: AppBar(
         backgroundColor: bg_dark,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        title: Text('My Profile', style: TextStyle(color: Colors.white)),
+        title: const Text('My Profile', style: TextStyle(color: Colors.white)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -130,13 +184,6 @@ class _AccountsPageState extends State<AccountsPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Center(
-              child: CircleAvatar(
-                radius: 80,
-                backgroundImage: NetworkImage(
-                    'https://example.com/user_image.jpg'),
-              ),
-            ),
             const SizedBox(height: 20),
             Form(
               key: _formKey,
@@ -147,6 +194,12 @@ class _AccountsPageState extends State<AccountsPage> {
                     hintText: 'Name',
                     icon: Icons.person,
                     obscureText: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your name';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFieldInput(
@@ -154,6 +207,14 @@ class _AccountsPageState extends State<AccountsPage> {
                     hintText: 'Email Address',
                     icon: Icons.email,
                     obscureText: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFieldInput(
@@ -161,6 +222,12 @@ class _AccountsPageState extends State<AccountsPage> {
                     hintText: 'Old Password',
                     icon: Icons.lock,
                     obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your old password';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFieldInput(
@@ -168,6 +235,12 @@ class _AccountsPageState extends State<AccountsPage> {
                     hintText: 'New Password',
                     icon: Icons.lock_outline,
                     obscureText: true,
+                    validator: (value) {
+                      if (value != null && value.isNotEmpty && value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   TextFieldInput(
@@ -175,6 +248,14 @@ class _AccountsPageState extends State<AccountsPage> {
                     hintText: 'Phone Number',
                     icon: Icons.phone,
                     obscureText: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      } else if (!RegExp(r'^\d{10,}$').hasMatch(value)) {
+                        return 'Enter a valid phone number';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 32),
                   Button(

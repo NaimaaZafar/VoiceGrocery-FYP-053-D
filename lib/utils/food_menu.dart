@@ -75,6 +75,12 @@ class Restaurant {
 
   List<Food> get menu => foodMenu;
 
+
+  List<Food> getall(){
+    fetchFoodMenu();
+    return foodMenu;
+  }
+
   Future<void> fetchFoodMenu() async {
     try {
       final QuerySnapshot snapshot =
@@ -100,6 +106,14 @@ class Restaurant {
     for (var food in foodMenu) {
       food.isFavorite = favoriteNames.contains(food.name);
     }
+  }
+
+  void saveReviewInFirebase(String review, String name) {
+    FirebaseFirestore.instance.collection('reviews').add({
+      'name': name,
+      'review': review,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 }
 

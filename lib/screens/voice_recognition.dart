@@ -7,6 +7,8 @@ import 'package:fyp/screens/profile.dart';
 import 'package:fyp/screens/search_product.dart';
 import 'package:fyp/screens/settings.dart';
 import 'package:fyp/utils/colors.dart';
+import 'package:fyp/utils/text_to_speech_service.dart';
+import 'package:fyp/utils/voice_responses.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,6 +17,7 @@ import 'package:fyp/screens/my_cart.dart';
 import 'package:fyp/screens/category.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+import 'package:fyp/screens/search.dart';
 
 class VoiceRecognitionScreen extends StatefulWidget {
   const VoiceRecognitionScreen({super.key});
@@ -25,6 +28,7 @@ class VoiceRecognitionScreen extends StatefulWidget {
 
 class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
   final _audioRecorder = AudioRecorder();
+  final _ttsService = TextToSpeechService();
   bool _isRecording = false;
   String _recordingPath = '';
   String _text = 'Press the microphone button to start speaking';
@@ -37,38 +41,80 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
   String _errorMessage = '';
   int _selectedIndex = 4; // For navbar selection
   String _detectedLanguage = '';
+  String _languageCode = 'en'; // Default language code
   
   @override
   void initState() {
     super.initState();
     _requestPermissions();
+    
+    // Speak welcome message after a short delay
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _speak('welcome');
+    });
   }
 
   // Request necessary permissions
+  // Future<void> _requestPermissions() async {
+  //   // Only check for iOS simulator, otherwise just request permission without blocking
+  //   if (Platform.isIOS) {
+  //     bool isIosSimulator = !await _audioRecorder.hasPermission();
+  //
+  //     if (isIosSimulator) {
+  //       setState(() {
+  //         _hasError = true;
+  //         _errorMessage = 'Microphone access is not available in iOS simulator. Please use a physical device for full functionality.';
+  //       });
+  //       return;
+  //     }
+  //   }
+  //
+  //   // Just request permissions without blocking on the result
+  //   // The actual recording attempt will determine if we have permission
+  //   await Permission.microphone.request();
+  //   await Permission.storage.request();
+  //
+  //   // Clear any previous error messages
+  //   setState(() {
+  //     _hasError = false;
+  //     _errorMessage = '';
+  //   });
+  // }
   Future<void> _requestPermissions() async {
-    // Only check for iOS simulator, otherwise just request permission without blocking
-    if (Platform.isIOS) {
-      bool isIosSimulator = !await _audioRecorder.hasPermission();
-      
-      if (isIosSimulator) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = 'Microphone access is not available in iOS simulator. Please use a physical device for full functionality.';
-        });
-        return;
-      }
-    }
+    // Request permissions for both iOS and Android
+    PermissionStatus microphoneStatus = await Permission.microphone.request();
+    PermissionStatus storageStatus = await Permission.storage.request();
 
-    // Just request permissions without blocking on the result
-    // The actual recording attempt will determine if we have permission
-    await Permission.microphone.request();
-    await Permission.storage.request();
-    
-    // Clear any previous error messages
-    setState(() {
-      _hasError = false;
-      _errorMessage = '';
-    });
+    // Check if permissions are granted
+    bool hasMicrophonePermission = microphoneStatus.isGranted;
+    bool hasStoragePermission = storageStatus.isGranted;
+
+    if (!hasMicrophonePermission || !hasStoragePermission) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = '';
+      });
+
+      // Automatically request permissions again if not granted
+      if (!hasMicrophonePermission) {
+        await Permission.microphone.request();
+      }
+      if (!hasStoragePermission) {
+        await Permission.storage.request();
+      }
+    } else {
+      // Clear any previous error messages
+      setState(() {
+        _hasError = false;
+        _errorMessage = '';
+      });
+    }
+  }
+
+  // Helper method to speak using the TTS service with current language
+  void _speak(String responseKey) {
+    final message = VoiceResponses.getResponse(_languageCode, responseKey);
+    _ttsService.speakWithLanguage(message, _languageCode);
   }
 
   // Start recording audio
@@ -101,8 +147,10 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
         _intentText = '';
         _detectedIntent = '';
         _detectedItems = [];
-        _detectedLanguage = '';
       });
+      
+      // Stop any ongoing speech
+      await _ttsService.stop();
     } catch (e) {
       setState(() {
         _hasError = true;
@@ -112,6 +160,9 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
       
       // Try requesting permission again as a last resort
       await Permission.microphone.request();
+      
+      // Speak error message
+      _speak('permission_denied');
     }
   }
 
@@ -125,6 +176,9 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
         _text = 'Processing your voice...';
       });
       
+      // Speak processing message
+      _speak('processing');
+      
       // First transcribe the audio, then process the intent
       final transcription = await _transcribeAudio();
       if (transcription != null && transcription.isNotEmpty) {
@@ -136,6 +190,9 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
         _hasError = true;
         _errorMessage = 'Error stopping recording: $e';
       });
+      
+      // Speak error message
+      _speak('try_again');
     }
   }
 
@@ -194,7 +251,7 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
         
         // Extract language if available
         if (data.containsKey('language')) {
-          final String langCode = data['language'];
+          _languageCode = data['language'];
           
           // Map language code to full name for display
           final Map<String, String> languageNames = {
@@ -204,7 +261,17 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
             'pa': 'Punjabi',
           };
           
-          _detectedLanguage = languageNames[langCode] ?? langCode;
+          _detectedLanguage = languageNames[_languageCode] ?? _languageCode;
+          
+          // Print debug information
+          print("Detected language code: $_languageCode");
+          print("Detected language name: $_detectedLanguage");
+          
+          // Set TTS language
+          await _ttsService.setLanguage(_languageCode);
+          
+          // Verify that language is properly set with debug message
+          print("Language set for TTS: ${_ttsService.currentLanguage}");
         }
         
         setState(() {
@@ -218,6 +285,10 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
           _hasError = true;
           _errorMessage = 'Error transcribing audio: ${response.statusCode} - ${response.body}';
         });
+        
+        // Speak error message
+        _speak('try_again');
+        
         return null;
       }
     } catch (e) {
@@ -226,6 +297,10 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
         _hasError = true;
         _errorMessage = 'Error transcribing audio: $e';
       });
+      
+      // Speak error message
+      _speak('try_again');
+      
       return null;
     }
   }
@@ -234,6 +309,9 @@ class _VoiceRecognitionScreenState extends State<VoiceRecognitionScreen> {
   Future<void> _processIntentWithGPT4o(String transcription) async {
     try {
       final apiKey = dotenv.env['OPENAI_API_KEY'];
+      print("Debug - API Key loaded: ${apiKey != null ? 'Yes (not empty)' : 'No'}");
+      print("Debug - API Key is empty: ${apiKey?.isEmpty ?? true}");
+      
       if (apiKey == null || apiKey.isEmpty) {
         setState(() {
           _isTranscribing = false;
@@ -260,9 +338,11 @@ The user may speak in English or Urdu but your response should be in English. Re
 1) add item(s) to cart
 2) search for item(s)
 3) go to cart
+4) remove item(s) from cart
+5) add a review for an item
 
 Return ONLY a valid JSON object with:
-- "intent" field (one of: "add_to_cart", "search", "go_to_cart", or "unknown")
+- "intent" field (one of: "add_to_cart", "search", "go_to_cart", "remove_from_cart", "add_review", or "unknown")
 - "items" array containing any item names mentioned, ALWAYS TRANSLATED TO ENGLISH regardless of the language spoken
 
 Examples:
@@ -272,6 +352,10 @@ English: "Show me tomatoes" → {"intent": "search", "items": ["tomato"]}
 Urdu: "مجھے ٹماٹر دکھائیں" → {"intent": "search", "items": ["tomato"]}
 English: "Go to my cart" → {"intent": "go_to_cart", "items": []}
 Urdu: "میرے کارٹ پر جائیں" → {"intent": "go_to_cart", "items": []}
+English: "Remove tomatoes from my cart" → {"intent": "remove_from_cart", "items": ["tomato"]}
+Urdu: "میرے کارٹ سے ٹماٹر نکالیں" → {"intent": "remove_from_cart", "items": ["tomato"]}
+English: "I want to add a review for apples" → {"intent": "add_review", "items": ["apple"]}
+Urdu: "میں سیب کے لیے ایک جائزہ شامل کرنا چاہتا ہوں" → {"intent": "add_review", "items": ["apple"]}
 
 Common grocery items in Urdu and their English translations:
 - سیب = apple
@@ -395,6 +479,14 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
                 textToCheck.contains('checkout') || 
                 textToCheck.contains('basket')) {
         intent = 'go_to_cart';
+      } else if (textToCheck.contains('remove') || 
+                textToCheck.contains('delete') ||
+                (textToCheck.contains('cart') && textToCheck.contains('take out'))) {
+        intent = 'remove_from_cart';
+      } else if (textToCheck.contains('review') || 
+                textToCheck.contains('add review') ||
+                textToCheck.contains('write review')) {
+        intent = 'add_review';
       }
       
       // Try to extract items using regex
@@ -429,36 +521,102 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
 
   // Handle navigation based on detected intent
   void _handleIntentNavigation() {
-    // Add a slight delay to show the intent before navigating
-    Future.delayed(const Duration(seconds: 2), () {
+    // Speak response based on intent
+    switch (_detectedIntent) {
+      case 'add_to_cart':
+        _speak('add_to_cart_success');
+        break;
+      case 'search':
+        _speak('search_starting');
+        break;
+      case 'go_to_cart':
+        _speak('go_to_cart');
+        break;
+      case 'remove_from_cart':
+        _speak('remove_from_cart');
+        break;
+      case 'add_review':
+        _speak('add_review');
+        break;
+      default:
+        _speak('command_not_understood');
+        break;
+    }
+    
+    // Add a slightly longer delay to allow speech to complete before navigating
+    Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       
       switch (_detectedIntent) {
         case 'add_to_cart':
           if (_detectedItems.isNotEmpty) {
+            // Navigate to search page with intent data instead of showing search delegate
             Navigator.pushReplacement(
-              context, 
+              context,
               MaterialPageRoute(
-                builder: (_) => const CategoryScreen(categoryName: 'MeatsFishes')
-              )
+                builder: (_) => SearchPage(
+                  searchQuery: _detectedItems.first,
+                  intent: _detectedIntent,
+                  detectedItems: _detectedItems,
+                  sourceLanguage: _languageCode,
+                ),
+              ),
             );
           }
           break;
         case 'search':
           if (_detectedItems.isNotEmpty) {
-            // Use showSearch with ProductSearchDelegate
-            showSearch(
-              context: context,
-              query: _detectedItems.first,
-              delegate: ProductSearchDelegate(category: "All")
+            // Navigate to search page with intent data instead of showing search delegate
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SearchPage(
+                  searchQuery: _detectedItems.first,
+                  intent: _detectedIntent,
+                  detectedItems: _detectedItems,
+                  sourceLanguage: _languageCode,
+                ),
+              ),
             );
           }
           break;
         case 'go_to_cart':
           Navigator.pushReplacement(
             context, 
-            MaterialPageRoute(builder: (_) => const MyCart())
+            MaterialPageRoute(builder: (_) => MyCart(
+              sourceLanguage: _languageCode,
+            ))
           );
+          break;
+        case 'remove_from_cart':
+          if (_detectedItems.isNotEmpty) {
+            // Navigate to cart page with intent to remove items
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MyCart(
+                  itemsToRemove: _detectedItems,
+                  sourceLanguage: _languageCode,
+                ),
+              ),
+            );
+          }
+          break;
+        case 'add_review':
+          if (_detectedItems.isNotEmpty) {
+            // Navigate to search page with intent data for review
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SearchPage(
+                  searchQuery: _detectedItems.first,
+                  intent: _detectedIntent,
+                  detectedItems: _detectedItems,
+                  sourceLanguage: _languageCode,
+                ),
+              ),
+            );
+          }
           break;
         default:
           // Stay on the same page
@@ -694,6 +852,16 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
         intentLabel = 'Go to Cart';
         intentColor = Colors.orange;
         break;
+      case 'remove_from_cart':
+        intentIcon = Icons.delete;
+        intentLabel = 'Remove from Cart';
+        intentColor = Colors.red;
+        break;
+      case 'add_review':
+        intentIcon = Icons.star;
+        intentLabel = 'Add Review';
+        intentColor = Colors.yellow;
+        break;
       default:
         intentIcon = Icons.question_mark;
         intentLabel = 'Unknown Intent';
@@ -748,6 +916,7 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
   @override
   void dispose() {
     _audioRecorder.dispose();
+    _ttsService.dispose();
     super.dispose();
   }
 } 

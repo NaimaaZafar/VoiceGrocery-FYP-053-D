@@ -7,10 +7,12 @@ import 'package:fyp/utils/food_menu.dart'; // Make sure to import the Food model
 
 class ProductCard extends StatefulWidget {
   final Food food;
+  final bool isHighlighted;
 
   const ProductCard({
     super.key,
     required this.food,
+    this.isHighlighted = false,
   });
 
   @override
@@ -62,11 +64,22 @@ class _ProductCardState extends State<ProductCard> {
         );
       },
       child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: widget.isHighlighted ? 6 : 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: widget.isHighlighted
+            ? BorderSide(color: Colors.blue, width: 2)
+            : BorderSide.none,
+        ),
         child: Container(
           height: 120,
           padding: const EdgeInsets.all(12),
+          decoration: widget.isHighlighted
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.blue.withOpacity(0.05),
+              )
+            : null,
           child: Row(
             children: [
               Image.asset(widget.food.imagePath,

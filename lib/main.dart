@@ -7,6 +7,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:fyp/screens/cart_fav_provider.dart';
 import 'package:fyp/utils/food_menu.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:fyp/screens/voice_recognition.dart';
 
 Future<void> main() async {
   final WidgetsBinding widgetsBining =
@@ -15,6 +17,8 @@ Future<void> main() async {
   // Load environment variables
   try {
     await dotenv.load(fileName: ".env");
+    print("Environment variables loaded successfully");
+    print("OPENAI_API_KEY exists: ${dotenv.env.containsKey('OPENAI_API_KEY')}");
   } catch (e) {
     // If the .env file doesn't exist or can't be loaded, we'll continue with a fallback
     print("Warning: Unable to load .env file: $e");

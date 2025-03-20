@@ -39,7 +39,7 @@ class _FavScreenState extends State<FavScreen> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (_) => const CategoryScreen(categoryName: '')));
+              builder: (_) => const CategoryScreen(categoryName: 'BrookiBakery')));
     } else if (index == 1) {
       // We're already on the Favorite screen
     } else if (index == 2) {

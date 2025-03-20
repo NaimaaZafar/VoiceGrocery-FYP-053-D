@@ -6,13 +6,23 @@ import 'package:fyp/screens/fav.dart';
 import 'package:fyp/screens/settings.dart';
 import 'package:fyp/screens/checkout.dart';
 import 'package:fyp/screens/voice_recognition.dart';
+import 'package:fyp/utils/food_menu.dart';
+import 'package:fyp/utils/text_to_speech_service.dart';
+import 'package:fyp/utils/voice_responses.dart';
 import 'package:fyp/widgets/navbar.dart';
 import 'package:fyp/widgets/button.dart';
 import 'package:provider/provider.dart';
 import '../widgets/product_card_add_remove.dart';
 
 class MyCart extends StatefulWidget {
-  const MyCart({super.key});
+  final List<String>? itemsToRemove;
+  final String? sourceLanguage; // The language detected from voice input
+  
+  const MyCart({
+    super.key,
+    this.itemsToRemove,
+    this.sourceLanguage,
+  });
 
   @override
   State<MyCart> createState() => _MyCartState();
@@ -20,9 +30,149 @@ class MyCart extends StatefulWidget {
 
 class _MyCartState extends State<MyCart> {
   int _selectedIndex = 0;
+  final _ttsService = TextToSpeechService();
+  String _languageCode = 'en'; // Default language
 
   // List to track whether an item is selected
   List<bool> selectedItems = [];
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Set the language from the source or default to English
+    _languageCode = widget.sourceLanguage ?? 'en';
+    
+    // Process items to remove if provided
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.itemsToRemove != null && widget.itemsToRemove!.isNotEmpty) {
+        _processItemsToRemove();
+      }
+    });
+  }
+  
+  void _speak(String responseKey) {
+    final message = VoiceResponses.getResponse(_languageCode, responseKey);
+    _ttsService.speakWithLanguage(message, _languageCode);
+  }
+  
+  void _processItemsToRemove() {
+    final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+    List<Food> itemsToRemove = [];
+    
+    // Find items in cart that match the names provided
+    for (String itemName in widget.itemsToRemove!) {
+      for (Food food in cartFavoriteProvider.cartItems) {
+        if (food.name.toLowerCase().contains(itemName.toLowerCase())) {
+          itemsToRemove.add(food);
+        }
+      }
+    }
+    
+    // If items to remove are found, show a confirmation dialog
+    if (itemsToRemove.isNotEmpty) {
+      // Speak the confirmation prompt
+      _speak('remove_from_cart');
+      _showRemoveConfirmationDialog(itemsToRemove, autoConfirm: true);
+    } else {
+      // If no matching items are found
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No items matching "${widget.itemsToRemove!.join(', ')}" found in your cart.'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      
+      // Speak the error message
+      _speak('item_not_found');
+    }
+  }
+  
+  void _showRemoveConfirmationDialog(List<Food> itemsToRemove, {bool autoConfirm = false}) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Remove Items'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Do you want to remove these items from your cart?'),
+            const SizedBox(height: 10),
+            ...itemsToRemove.map((food) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Row(
+                children: [
+                  Image.asset(food.imagePath, width: 40, height: 40),
+                  const SizedBox(width: 10),
+                  Text(food.name),
+                ],
+              ),
+            )).toList(),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+              
+              // Remove each item
+              for (Food food in itemsToRemove) {
+                cartFavoriteProvider.removeFromCart(food);
+              }
+              
+              Navigator.of(dialogContext).pop();
+              
+              // Show confirmation message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${itemsToRemove.length} item(s) removed from your cart'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+              
+              // Speak confirmation message
+              _speak('remove_from_cart_confirm');
+            },
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    
+    // Auto-confirm after a short delay if requested
+    if (autoConfirm) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        // Make sure the dialog is still showing before trying to confirm
+        if (Navigator.of(context).canPop()) {
+          final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+          
+          // Remove each item
+          for (Food food in itemsToRemove) {
+            cartFavoriteProvider.removeFromCart(food);
+          }
+          
+          // Close the dialog
+          Navigator.of(context).pop();
+          
+          // Show confirmation message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${itemsToRemove.length} item(s) removed from your cart'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          
+          // Speak confirmation message
+          _speak('remove_from_cart_confirm');
+        }
+      });
+    }
+  }
 
   void _onItemSelected(int index) {
     setState(() {
@@ -143,5 +293,11 @@ class _MyCartState extends State<MyCart> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _ttsService.dispose();
+    super.dispose();
   }
 }

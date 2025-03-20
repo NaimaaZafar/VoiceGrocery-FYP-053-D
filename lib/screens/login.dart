@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
 
+
       // Close the loading dialog
       Navigator.pop(context);
 
@@ -204,14 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SquareTile(imagePath: 'asset/google.png'),
-                      SizedBox(width: 20),
-                      SquareTile(imagePath: 'asset/meta.png')
-                    ],
-                  ),
+
                   const SizedBox(height: 25),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

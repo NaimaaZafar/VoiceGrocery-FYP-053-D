@@ -1,3 +1,37 @@
+# Voice Grocery App
+
+A grocery shopping app with voice recognition capabilities.
+
+## Environment Setup
+
+1. Create a `.env` file in the root directory of the project
+2. Add your OpenAI API key to this file:
+
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+Replace `your_openai_api_key_here` with your actual OpenAI API key.
+
+## Voice Recognition Features
+
+The app supports the following voice commands:
+
+- **Add to Cart**: "Add apples to my cart", "I want to buy bananas"
+- **Search Items**: "Show me tomatoes", "Find milk"
+- **Go to Cart**: "Go to my cart", "Show my basket"
+- **Remove from Cart**: "Remove tomatoes from my cart", "Delete apples from cart"
+
+## Getting Started
+
+1. Install dependencies: `flutter pub get`
+2. Add your OpenAI API key to the `.env` file
+3. Run the app: `flutter run`
+
+## Note
+
+This app supports voice recognition in multiple languages, including English and Urdu.
+
 ## Voice Grocery
 
 - Java SDK-17

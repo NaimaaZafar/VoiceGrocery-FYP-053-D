@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp/screens/search.dart';
 import 'package:fyp/screens/settings.dart';
 import 'package:fyp/utils/get_user_name.dart';
 import 'package:fyp/widgets/my_drawer.dart';
@@ -43,7 +44,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     super.initState();
     _scrollController = ScrollController();
     selectedCategory =
-        widget.categoryName.isNotEmpty ? widget.categoryName : 'Meats & Fishes';
+    widget.categoryName.isNotEmpty ? widget.categoryName : 'Meats & Fishes';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToCategory();
@@ -97,7 +98,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           context,
           MaterialPageRoute(
               builder: (_) =>
-                  const CategoryScreen(categoryName: 'MeatsFishes')));
+              const CategoryScreen(categoryName: 'MeatsFishes')));
     } else if (index == 1) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const FavScreen()));
@@ -116,7 +117,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   // getting size of cart
   int sizeofcart() {
     final cartFavoriteProvider =
-        Provider.of<CartFavoriteProvider>(context, listen: false);
+    Provider.of<CartFavoriteProvider>(context, listen: false);
     return cartFavoriteProvider.cartItems.length;
   }
 
@@ -134,13 +135,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
         elevation: 10,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            iconSize: 25,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SearchPage()));
+            },
+          ),
           Center(
             child: badges.Badge(
               badgeContent: Text(
                 sizeofcart().toString(),
                 style: TextStyle(color: Colors.white),
               ),
-              //animationDuration: Duration(microseconds: 300),
               child: IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 iconSize: 25,
@@ -158,7 +168,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header and categories
           Container(
             color: bg_dark,
             width: double.infinity,
@@ -222,7 +231,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       selectedCategory = 'BrookiBakery';
                     }),
                   ),
-                  // Add other categories here...
                 ],
               ),
             ),

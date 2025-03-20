@@ -92,6 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: const Text('Logout'),
             onTap: () {
               FirebaseAuth.instance.signOut();
+
             },
           ),
           ListTile(

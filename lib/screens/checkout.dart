@@ -12,13 +12,14 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double totalPrice = selectedItems.fold(0, (sum, item) => sum + item.price);
+    double totalPrice = selectedItems.fold(0, (sum, item) => sum + item.price*item.quantity);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout!', style: TextStyle(color: Colors.white),),
         backgroundColor: bg_dark,
       ),
+
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
