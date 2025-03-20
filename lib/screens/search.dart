@@ -7,6 +7,7 @@ import 'package:fyp/screens/item_details.dart';
 import 'package:provider/provider.dart';
 import 'package:fyp/screens/cart_fav_provider.dart';
 import 'package:fyp/screens/my_cart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchPage extends StatefulWidget {
   final String? searchQuery;
@@ -79,6 +80,8 @@ class _SearchPageState extends State<SearchPage> {
         return 'remove_from_cart';
       case 'add_review':
         return 'add_review';
+      case 'favorite':
+        return 'favorite_starting';
       default:
         return 'processing';
     }
@@ -244,6 +247,8 @@ class _SearchPageState extends State<SearchPage> {
         return Icons.shopping_cart;
       case 'remove_from_cart':
         return Icons.delete;
+      case 'favorite':
+        return Icons.favorite;
       default:
         return Icons.help_outline;
     }
@@ -259,6 +264,8 @@ class _SearchPageState extends State<SearchPage> {
         return Colors.orange[700]!;
       case 'remove_from_cart':
         return Colors.red[700]!;
+      case 'favorite':
+        return Colors.pink[700]!;
       default:
         return Colors.grey[700]!;
     }
@@ -274,6 +281,8 @@ class _SearchPageState extends State<SearchPage> {
         return 'Go to Cart';
       case 'add_review':
         return 'Add Review';
+      case 'favorite':
+        return 'Add to Favorites';
       default:
         return 'Unknown';
     }
@@ -403,8 +412,8 @@ class EnhancedProductSearchDelegate extends SearchDelegate<String> {
         return Icons.shopping_cart;
       case 'remove_from_cart':
         return Icons.delete;
-      case 'add_review':
-        return Icons.star;
+      case 'favorite':
+        return Icons.favorite;
       default:
         return Icons.help_outline;
     }
@@ -420,8 +429,8 @@ class EnhancedProductSearchDelegate extends SearchDelegate<String> {
         return Colors.orange[700]!;
       case 'remove_from_cart':
         return Colors.red[700]!;
-      case 'add_review':
-        return Colors.amber[700]!;
+      case 'favorite':
+        return Colors.pink[700]!;
       default:
         return Colors.grey[700]!;
     }
@@ -578,6 +587,36 @@ class AutoSubmitSearchDelegate extends SearchDelegate<String> {
         }
       });
     }
+    
+    // If we have a favorite intent and haven't auto-submitted yet,
+    // automatically favorite the first item
+    if (intent == 'favorite' && !_hasAutoSubmitted && filteredProducts.isNotEmpty) {
+      _hasAutoSubmitted = true;
+      
+      // Use a delay to show the results briefly before favoriting
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!context.mounted) return;
+        if (filteredProducts.isNotEmpty) {
+          final selectedFood = filteredProducts[0];
+          
+          // Get the cart/favorite provider
+          final cartFavoriteProvider = Provider.of<CartFavoriteProvider>(context, listen: false);
+          
+          // Add the item to favorites
+          selectedFood.isFavorite = true;
+          cartFavoriteProvider.addToFavorites(selectedFood);
+          
+          // Update favorite status in Firestore
+          _updateFavoriteStatus(selectedFood, true);
+          
+          // Speak confirmation message
+          _speak('favorite_confirm');
+          
+          // Close the search
+          close(context, selectedFood.name);
+        }
+      });
+    }
 
     // Show a list of matched products
     return ListView.builder(
@@ -720,8 +759,8 @@ class AutoSubmitSearchDelegate extends SearchDelegate<String> {
         return Icons.shopping_cart;
       case 'remove_from_cart':
         return Icons.delete;
-      case 'add_review':
-        return Icons.star;
+      case 'favorite':
+        return Icons.favorite;
       default:
         return Icons.help_outline;
     }
@@ -737,10 +776,26 @@ class AutoSubmitSearchDelegate extends SearchDelegate<String> {
         return Colors.orange[700]!;
       case 'remove_from_cart':
         return Colors.red[700]!;
-      case 'add_review':
-        return Colors.amber[700]!;
+      case 'favorite':
+        return Colors.pink[700]!;
       default:
         return Colors.grey[700]!;
+    }
+  }
+
+  // Update favorite status in Firestore
+  Future<void> _updateFavoriteStatus(Food food, bool isFavorite) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: food.name)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.update({'Fav': isFavorite});
+      }
+    } catch (e) {
+      print('Error updating favorite status: $e');
     }
   }
 

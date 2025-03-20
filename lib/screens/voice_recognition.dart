@@ -340,9 +340,10 @@ The user may speak in English or Urdu but your response should be in English. Re
 3) go to cart
 4) remove item(s) from cart
 5) add a review for an item
+6) favorite an item
 
 Return ONLY a valid JSON object with:
-- "intent" field (one of: "add_to_cart", "search", "go_to_cart", "remove_from_cart", "add_review", or "unknown")
+- "intent" field (one of: "add_to_cart", "search", "go_to_cart", "remove_from_cart", "add_review","favorite" or "unknown")
 - "items" array containing any item names mentioned, ALWAYS TRANSLATED TO ENGLISH regardless of the language spoken
 
 Examples:
@@ -356,6 +357,10 @@ English: "Remove tomatoes from my cart" → {"intent": "remove_from_cart", "item
 Urdu: "میرے کارٹ سے ٹماٹر نکالیں" → {"intent": "remove_from_cart", "items": ["tomato"]}
 English: "I want to add a review for apples" → {"intent": "add_review", "items": ["apple"]}
 Urdu: "میں سیب کے لیے ایک جائزہ شامل کرنا چاہتا ہوں" → {"intent": "add_review", "items": ["apple"]}
+English: "I want to favorite apples" → {"intent": "favorite", "items": ["apple"]}
+English: "Add chicken to my favorites" → {"intent": "favorite", "items": ["chicken"]}
+Urdu: "میں سیب کو پسندیدہ کرنا چاہتا ہوں" → {"intent": "favorite", "items": ["apple"]}
+Urdu: "مرغی کو میرے پسندیدہ میں شامل کریں" → {"intent": "favorite", "items": ["chicken"]}
 
 Common grocery items in Urdu and their English translations:
 - سیب = apple
@@ -487,6 +492,11 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
                 textToCheck.contains('add review') ||
                 textToCheck.contains('write review')) {
         intent = 'add_review';
+      } else if (textToCheck.contains('favorite') || 
+                textToCheck.contains('like') ||
+                textToCheck.contains('heart') ||
+                textToCheck.contains('save') && textToCheck.contains('item')) {
+        intent = 'favorite';
       }
       
       // Try to extract items using regex
@@ -537,6 +547,9 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
         break;
       case 'add_review':
         _speak('add_review');
+        break;
+      case 'favorite':
+        _speak('favorite_starting');
         break;
       default:
         _speak('command_not_understood');
@@ -605,6 +618,22 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
         case 'add_review':
           if (_detectedItems.isNotEmpty) {
             // Navigate to search page with intent data for review
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SearchPage(
+                  searchQuery: _detectedItems.first,
+                  intent: _detectedIntent,
+                  detectedItems: _detectedItems,
+                  sourceLanguage: _languageCode,
+                ),
+              ),
+            );
+          }
+          break;
+        case 'favorite':
+          if (_detectedItems.isNotEmpty) {
+            // Navigate to search page with intent data for favoriting
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -861,6 +890,11 @@ IMPORTANT: Your response must be a valid JSON object and nothing else. No explan
         intentIcon = Icons.star;
         intentLabel = 'Add Review';
         intentColor = Colors.yellow;
+        break;
+      case 'favorite':
+        intentIcon = Icons.favorite;
+        intentLabel = 'Add to Favorites';
+        intentColor = Colors.pink;
         break;
       default:
         intentIcon = Icons.question_mark;

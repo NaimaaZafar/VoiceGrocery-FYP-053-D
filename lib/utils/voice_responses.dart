@@ -21,6 +21,8 @@ class VoiceResponses {
       'add_review': 'Let\'s add a review for this item.',
       'add_review_start': 'Please tell me your review.',
       'add_review_confirm': 'Your review has been added.',
+      'favorite_starting': 'Searching for items to add to favorites.',
+      'favorite_confirm': 'Item has been added to your favorites.',
       
       // Error responses
       'item_not_found': 'Sorry, I couldn\'t find that item.',
@@ -48,6 +50,8 @@ class VoiceResponses {
       'add_review': 'آئیے اس آئٹم کا جائزہ شامل کریں۔',
       'add_review_start': 'براہ کرم مجھے اپنی رائے بتائیں۔',
       'add_review_confirm': 'آپ کا جائزہ شامل کر دیا گیا ہے۔',
+      'favorite_starting': 'پسندیدہ میں شامل کرنے کے لیے آئٹمز تلاش کی جا رہی ہیں۔',
+      'favorite_confirm': 'آئٹم آپ کے پسندیدہ میں شامل کر دیا گیا ہے۔',
       
       // Error responses
       'item_not_found': 'معذرت، مجھے وہ آئٹم نہیں مل سکا۔',
@@ -75,6 +79,8 @@ class VoiceResponses {
       'add_review': 'चलिए इस आइटम के लिए समीक्षा जोड़ते हैं।',
       'add_review_start': 'कृपया मुझे अपनी समीक्षा बताएं।',
       'add_review_confirm': 'आपकी समीक्षा जोड़ दी गई है।',
+      'favorite_starting': 'पसंदीदा में जोड़ने के लिए आइटम खोजे जा रहे हैं।',
+      'favorite_confirm': 'आइटम आपके पसंदीदा में जोड़ दिया गया है।',
       
       // Error responses
       'item_not_found': 'क्षमा करें, मुझे वह आइटम नहीं मिला।',
